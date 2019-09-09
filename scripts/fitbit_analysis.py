@@ -94,5 +94,6 @@ step_days.plot(x="day_of_week",y="Steps",kind="bar")
 df["calories_goal_met"]= np.where(df["Calories"] >= 3000,1,0)
 df["active_minutes_goal_met"] = np.where(df["VeryActiveMinutes"] >= 60,1,0)
 df["step_goal_met"] = np.where(df["Steps"] >= 7500,1,0)
+df["sleep_ge_seven_hours"] = np.where(df["sleep_duration"] >= 7,1,0)
 
 df.to_csv("../processed_data/statistical_dataset.csv",index=False)
