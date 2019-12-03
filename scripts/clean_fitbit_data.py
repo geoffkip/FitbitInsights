@@ -836,6 +836,8 @@ final_df = final_df[['Date', 'BPM', 'RestingBPM','sleep_duration', 'sleep_effici
        'ExerciseFatBurnMinutes', 'ExerciseCardioMaxHR', 'ExerciseCardioMinHR',
        'ExerciseCardioMinutes', 'ExercisePeakMaxHR', 'ExercisePeakMinHR',
        'ExercisePeakMinutes', 'Speed', 'Pace', 'ExerciseDistance',
-       'runVO2Max']]
+       'runVO2Max','overall_score', 'composition_score',
+       'revitalization_score', 'duration_score', 'deep_sleep_in_minutes',
+       'resting_heart_rate', 'restlessness']]
 
 final_df.to_csv("../processed_data/final_dataset_12012019.csv",index=False)
