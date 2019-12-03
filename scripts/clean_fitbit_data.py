@@ -62,7 +62,7 @@ df.to_csv("../processed_data/all_heart_rate_data.csv",index=False)
 
 ##Read in data from csv file ###
 df = pd.read_csv("../processed_data/all_heart_rate_data.csv")
-df["DateTime"] = pd.to_datetime(df["Date"],format="%Y/%m/%d %H:%M:%S")
+df["DateTime"] = pd.to_datetime(df["DateTime"],format="%Y/%m/%d %H:%M:%S")
 
 df['Year']= df['DateTime'].dt.year
 df['Month']=df['DateTime'].dt.month
