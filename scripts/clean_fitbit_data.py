@@ -58,6 +58,7 @@ df["DateTime"] = pd.to_datetime(df["DateTime"],format="%m/%d/%y %H:%M:%S")
 df.sort_values(by="DateTime",inplace=True)
 df["DateTime"].min()
 df["DateTime"].max()
+df.to_csv("../processed_data/all_heart_rate_data.csv",index=False)
 
 ##Read in data from csv file ###
 df = pd.read_csv("../processed_data/all_heart_rate_data.csv")
@@ -686,7 +687,10 @@ for d in results:
        ExerciseDate = d["startTime"]
        ExerciseActivityName = d["activityName"]
        ExerciseActiveDuration= d["activeDuration"]
-       ExerciseAverageHeartRate= d["averageHeartRate"]
+       try:
+           ExerciseAverageHeartRate= d["averageHeartRate"]
+       except:
+           ExerciseAverageHeartRate = 0
        ExerciseCalories = d["calories"]
        ExerciseDuration = d["duration"]
        try:
@@ -713,18 +717,54 @@ for d in results:
        ExerciseLightMinutes = d["activityLevel"][1]["minutes"]
        ExerciseFairlyActiveMinutes = d["activityLevel"][2]["minutes"]
        ExerciseVeryActiveMinutes = d["activityLevel"][3]["minutes"]
-       ExerciseOutOfRangeMaxHR = d["heartRateZones"][0]["max"]
-       ExerciseOutOfRangeMinHR = d["heartRateZones"][0]["min"]
-       ExerciseOutOfRangeMinutes = d["heartRateZones"][0]["minutes"]
-       ExerciseFatBurnMaxHR = d["heartRateZones"][1]["max"]
-       ExerciseFatBurnMinHR = d["heartRateZones"][1]["min"]
-       ExerciseFatBurnMinutes = d["heartRateZones"][1]["minutes"]
-       ExerciseCardioMaxHR = d["heartRateZones"][2]["max"]
-       ExerciseCardioMinHR = d["heartRateZones"][2]["min"]
-       ExerciseCardioMinutes = d["heartRateZones"][2]["minutes"]
-       ExercisePeakMaxHR = d["heartRateZones"][3]["max"]
-       ExercisePeakMinHR = d["heartRateZones"][3]["min"]
-       ExercisePeakMinutes = d["heartRateZones"][3]["minutes"]
+       try:
+           ExerciseOutOfRangeMaxHR = d["heartRateZones"][0]["max"]
+       except:
+           ExerciseOutOfRangeMaxHR = 0
+       try:
+           ExerciseOutOfRangeMinHR = d["heartRateZones"][0]["min"]
+       except:
+           ExerciseOutOfRangeMinHR = 0
+       try:
+           ExerciseOutOfRangeMinutes = d["heartRateZones"][0]["minutes"]
+       except:
+           ExerciseOutOfRangeMinutes = 0
+       try: 
+           ExerciseFatBurnMaxHR = d["heartRateZones"][1]["max"]
+       except: 
+           ExerciseFatBurnMaxHR = 0
+       try:
+           ExerciseFatBurnMinHR = d["heartRateZones"][1]["min"]
+       except:
+           ExerciseFatBurnMinHR = 0
+       try:
+           ExerciseFatBurnMinutes = d["heartRateZones"][1]["minutes"]
+       except:
+           ExerciseFatBurnMinutes = 0
+       try: 
+           ExerciseCardioMaxHR = d["heartRateZones"][2]["max"]
+       except:    
+           ExerciseCardioMaxHR = 0
+       try: 
+           ExerciseCardioMinHR = d["heartRateZones"][2]["min"]
+       except:
+           ExerciseCardioMinHR = 0
+       try: 
+           ExerciseCardioMinutes = d["heartRateZones"][2]["minutes"]
+       except:
+           ExerciseCardioMinutes = 0
+       try: 
+           ExercisePeakMaxHR = d["heartRateZones"][3]["max"]
+       except:
+           ExercisePeakMaxHR = 0
+       try: 
+           ExercisePeakMinHR = d["heartRateZones"][3]["min"]
+       except:
+           ExercisePeakMinHR = 0
+       try:
+           ExercisePeakMinutes = d["heartRateZones"][3]["minutes"]
+       except:
+           ExercisePeakMinutes = 0
        ##Add to dictionary
        exercise_dict["ExerciseDate"].append(ExerciseDate)
        exercise_dict["ExerciseActivityName"].append(ExerciseActivityName)
@@ -754,7 +794,6 @@ for d in results:
        exercise_dict["Pace"].append(Pace)
        exercise_dict["ExerciseDistance"].append(ExerciseDistance)
        
-    
 exercise_df = pd.DataFrame(exercise_dict)
 exercise_df.dtypes
 exercise_df["ExerciseDate"] = pd.to_datetime(exercise_df["ExerciseDate"],format="%m/%d/%y %H:%M:%S")
@@ -805,7 +844,13 @@ run_vo2_df.to_csv("../processed_data/run_vo2.csv",index=False)
 # Read sleep score data in
 sleep_score_df = pd.read_csv("../data/sleep_score.csv")
 sleep_score_df["timestamp"] = pd.to_datetime(sleep_score_df["timestamp"])
-sleep_score_df = sleep_score_df[['timestamp', 'overall_score', 'composition_score',
+
+sleep_score_df['Year']= sleep_score_df['timestamp'].dt.year
+sleep_score_df['Month']=sleep_score_df['timestamp'].dt.month
+sleep_score_df['Day']= sleep_score_df['timestamp'].dt.day
+
+sleep_score_df['YearMonthDay'] = pd.to_datetime(sleep_score_df[['Year', 'Month', 'Day']])
+sleep_score_df = sleep_score_df[['YearMonthDay', 'overall_score', 'composition_score',
        'revitalization_score', 'duration_score', 'deep_sleep_in_minutes',
        'resting_heart_rate', 'restlessness']]
 
@@ -814,7 +859,7 @@ all_df13= pd.merge(all_df12, run_vo2_df, left_on="ExerciseDate", right_on="Date"
 all_df13.drop(["Date_y"],axis=1,inplace=True)
 all_df13.rename(columns= {"Date_x":"Date"},inplace=True)
 
-final_df = pd.merge(all_df13,sleep_score_df,left_on="Date",right_on="timestamp",how="left")
+final_df = pd.merge(all_df13,sleep_score_df,left_on="Date",right_on="YearMonthDay",how="left")
 final_df.dtypes
 final_df.columns
 
