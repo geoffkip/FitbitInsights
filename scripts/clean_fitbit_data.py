@@ -802,9 +802,19 @@ run_vo2_df.sort_values(by='Date',inplace=True)
 
 run_vo2_df.to_csv("../processed_data/run_vo2.csv",index=False)
 
-final_df= pd.merge(all_df12, run_vo2_df, left_on="ExerciseDate", right_on="Date", how='left')
-final_df.drop(["Date_y"],axis=1,inplace=True)
-final_df.rename(columns= {"Date_x":"Date"},inplace=True)
+# Read sleep score data in
+sleep_score_df = pd.read_csv("../data/sleep_score.csv")
+sleep_score_df["timestamp"] = pd.to_datetime(sleep_score_df["timestamp"])
+sleep_score_df = sleep_score_df[['timestamp', 'overall_score', 'composition_score',
+       'revitalization_score', 'duration_score', 'deep_sleep_in_minutes',
+       'resting_heart_rate', 'restlessness']]
+
+# Create final dataframe
+all_df13= pd.merge(all_df12, run_vo2_df, left_on="ExerciseDate", right_on="Date", how='left')
+all_df13.drop(["Date_y"],axis=1,inplace=True)
+all_df13.rename(columns= {"Date_x":"Date"},inplace=True)
+
+final_df = pd.merge(all_df13,sleep_score_df,left_on="Date",right_on="timestamp",how="left")
 final_df.dtypes
 final_df.columns
 
@@ -828,6 +838,4 @@ final_df = final_df[['Date', 'BPM', 'RestingBPM','sleep_duration', 'sleep_effici
        'ExercisePeakMinutes', 'Speed', 'Pace', 'ExerciseDistance',
        'runVO2Max']]
 
-final_df.to_csv("../processed_data/final_dataset_09082019.csv",index=False)
-
-
+final_df.to_csv("../processed_data/final_dataset_12012019.csv",index=False)
