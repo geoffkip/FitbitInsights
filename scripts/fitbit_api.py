@@ -14,24 +14,26 @@ ACCESS_TOKEN = str(server.fitbit.client.session.token['access_token'])
 REFRESH_TOKEN = str(server.fitbit.client.session.token['refresh_token'])
 auth2_client = fitbit.Fitbit(CLIENT_ID, CLIENT_SECRET, oauth2=True, access_token=ACCESS_TOKEN, refresh_token=REFRESH_TOKEN)
 
-#Grab data
-backtrack = str((datetime.datetime.now() - datetime.timedelta(days=365)).strftime("%Y-%m-%d"))
-today = str(datetime.datetime.now().strftime("%Y%m%d"))
-
-fit_statsHR = auth2_client.intraday_time_series('activities/heart', base_date=backtrack, detail_level='1sec')
-print(fit_statsHR)
+#Get resting heart rate by day
+startTime = pd.datetime(year = 2020, month = 3, day = 25)
+endTime = pd.datetime.today().date() - datetime.timedelta(days=1)
 
 time_list = []
 rhr_list = []
-for i in fit_statsHR['activities-heart']:
-    print(fit_statsHR['activities-heart'])
-    rhr_list.append(i['value']['restingHeartRate'])
-    time_list.append(i['dateTime'])
-heartdf = pd.DataFrame({'Heart Rate':rhr_list,'Time':time_list})
-heartdf.head()
+df_list = []
+allDates = pd.date_range(start=startTime, end = endTime)
 
-heartdf.to_csv('../processed_data/heart'+ \
-               backtrack+'.csv', \
+for oneDate in allDates:
+    oneDate = oneDate.date().strftime("%Y-%m-%d")
+    oneDayData = auth2_client.intraday_time_series('activities/heart', base_date=oneDate, detail_level='1sec')
+    #print(oneDayData)
+    rhr_list.append(oneDayData['activities-heart'][0]['value']['restingHeartRate'])
+    time_list.append(oneDayData['activities-heart'][0]['dateTime'])
+    df = pd.DataFrame({'Time':time_list, 'Heart Rate':rhr_list})    
+
+    
+df.to_csv('../processed_data/heart'+ \
+               str(startTime)+'.csv', \
                columns=['Time','Heart Rate'], header=True, \
                index = False)
 
