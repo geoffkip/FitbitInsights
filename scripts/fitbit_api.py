@@ -15,24 +15,23 @@ REFRESH_TOKEN = str(server.fitbit.client.session.token['refresh_token'])
 auth2_client = fitbit.Fitbit(CLIENT_ID, CLIENT_SECRET, oauth2=True, access_token=ACCESS_TOKEN, refresh_token=REFRESH_TOKEN)
 
 #Grab data
-yesterday = str((datetime.datetime.now() - datetime.timedelta(days=1)).strftime("%Y%m%d"))
-yesterday2 = str((datetime.datetime.now() - datetime.timedelta(days=1)).strftime("%Y-%m-%d"))
+backtrack = str((datetime.datetime.now() - datetime.timedelta(days=365)).strftime("%Y-%m-%d"))
 today = str(datetime.datetime.now().strftime("%Y%m%d"))
 
-fit_statsHR = auth2_client.intraday_time_series('activities/heart', base_date=yesterday2, detail_level='1sec')
+fit_statsHR = auth2_client.intraday_time_series('activities/heart', base_date=backtrack, detail_level='1sec')
 print(fit_statsHR)
 
 time_list = []
-val_list = []
-for i in fit_statsHR['activities-heart-intraday']['dataset']:
-    val_list.append(i['value'])
-    time_list.append(i['time'])
-heartdf = pd.DataFrame({'Heart Rate':val_list,'Time':time_list})
-
-heart_df.head()
+rhr_list = []
+for i in fit_statsHR['activities-heart']:
+    print(fit_statsHR['activities-heart'])
+    rhr_list.append(i['value']['restingHeartRate'])
+    time_list.append(i['dateTime'])
+heartdf = pd.DataFrame({'Heart Rate':rhr_list,'Time':time_list})
+heartdf.head()
 
 heartdf.to_csv('../processed_data/heart'+ \
-               yesterday+'.csv', \
+               backtrack+'.csv', \
                columns=['Time','Heart Rate'], header=True, \
                index = False)
 
